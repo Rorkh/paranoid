@@ -32,8 +32,11 @@ function paranoid.register_alias(alias, compound)
 end
 
 function paranoid.execute_rule(rule, value)
+    local net_arguments = get_locals(5)
+    local client = net_arguments.client
+
     local rule_definition, rule_name = nil, nil
-    local args = {}
+    local args = {client = client}
 
     if type(rule) == "string" then
         rule_name = rule
@@ -41,7 +44,9 @@ function paranoid.execute_rule(rule, value)
     else
         rule_name = rule.name
         rule_definition = paranoid.rules[rule_name]
+
         args = rule.args and rule.args or {}
+        args.client = client
     end
 
     if not rule_definition then
@@ -51,13 +56,11 @@ function paranoid.execute_rule(rule, value)
     end
 
     if not rule_definition.callback(value, args) then
-        local net_arguments = get_locals(5)
-
-        hook.Run("OnParanoidDetection", net_arguments.client, rule_name)
+        hook.Run("OnParanoidDetection", client, rule_name)
 
         if paranoid.config.treatment then
-            hook.Run("OnParanoidTreatment", net_arguments.client)
-            paranoid.config.treatment(net_arguments.client)
+            hook.Run("OnParanoidTreatment", client)
+            paranoid.config.treatment(client)
         end
 
         return false
