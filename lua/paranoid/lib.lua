@@ -16,10 +16,6 @@ local function get_locals(level)
     return locals
 end
 
-function paranoid_test()
-    return false
-end
-
 paranoid.rules = paranoid.rules or {}
 paranoid.aliases = paranoid.aliases or {}
 
